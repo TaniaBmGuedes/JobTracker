@@ -8,7 +8,7 @@ export default function Header({ activeTab, setActiveTab }) {
     <header className="border-b border-divider bg-content1 mb-6">
       <div className="max-w-4xl mx-auto px-4 pt-4">
         <div className="flex items-center gap-3 mb-4">
-          <img src="/logo.png" alt="Job Tracker" className="w-10 h-10" />
+          <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Job Tracker" className="w-10 h-10" />
           <div>
             <h1 className="text-2xl font-bold text-primary">Job Tracker</h1>
             <p className="text-sm text-default-500">Track your applications and progress</p>
