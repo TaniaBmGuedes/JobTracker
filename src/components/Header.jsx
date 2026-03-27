@@ -1,6 +1,7 @@
 const TABS = [
   { key: 'applications', label: 'Applications' },
   { key: 'profile', label: 'My Profile' },
+  { key: 'rules', label: 'Rules' },
 ]
 
 export default function Header({ activeTab, setActiveTab }) {

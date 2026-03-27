@@ -185,6 +185,19 @@ export default function ApplicationForm({ isOpen, onClose, form, setForm, editin
             </div>
 
             <div>
+              <label className="text-sm font-medium text-default-700 mb-1 block">Role Description</label>
+              <InputGroup fullWidth>
+                <InputGroupTextArea
+                  value={form.roleDescription || ''}
+                  onChange={updateField('roleDescription')}
+                  placeholder="Paste or describe the job role requirements..."
+                  rows={3}
+                  aria-label="Role Description"
+                />
+              </InputGroup>
+            </div>
+
+            <div>
               <label className="text-sm font-medium text-default-700 mb-1 block">Notes / Feedback</label>
               <InputGroup fullWidth>
                 <InputGroupTextArea

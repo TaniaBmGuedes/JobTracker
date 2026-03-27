@@ -10,6 +10,7 @@ const emptyForm = {
   date: new Date().toISOString().split('T')[0],
   contact: '',
   notes: '',
+  roleDescription: '',
   salary: '',
   url: '',
   screenshots: [],
@@ -206,33 +207,55 @@ export function useApplications() {
         return result
       }
 
-      const headers = parseCSVLine(lines[0]).map((h) => h.toLowerCase().replace(/\s+/g, ''))
+      const headers = parseCSVLine(lines[0]).map((h) => h.toLowerCase().replace(/\s+/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, ''))
       const imported = []
 
       for (let i = 1; i < lines.length; i++) {
         const values = parseCSVLine(lines[i])
-        if (values.length < 2) continue
+        if (values.length < 1) continue
 
-        const get = (name) => {
-          const idx = headers.indexOf(name)
-          return idx >= 0 ? values[idx] || '' : ''
+        const get = (...names) => {
+          for (const name of names) {
+            const idx = headers.indexOf(name)
+            if (idx >= 0 && values[idx]) return values[idx].trim()
+          }
+          return ''
         }
 
+        const parseDate = (raw) => {
+          if (!raw) return today()
+          // Handle d/m/y or d/m/yy formats
+          const parts = raw.split(/[/\-.]/)
+          if (parts.length >= 3) {
+            let [d, m, y] = parts
+            if (y.length === 2) y = '20' + y
+            return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
+          }
+          return raw
+        }
+
+        const rawStatus = get('status', 'estado', 'situacao')
         const validStatuses = ['applied', 'interview', 'offer', 'rejected', 'no_response']
-        const status = get('status').toLowerCase().replace(/\s+/g, '_')
+        const status = rawStatus ? rawStatus.toLowerCase().replace(/\s+/g, '_') : ''
+
+        const hasInterview = get('entrevista', 'interview')
+        const inferredStatus = hasInterview ? 'interview' : 'applied'
+
+        const rawDate = get('datadeenviodecv', 'dataenvio', 'dataenviocv', 'dateapplied', 'date', 'data')
 
         imported.push({
           id: Date.now() + i,
-          company: get('company') || 'Unknown',
-          role: get('role') || 'Unknown',
-          status: validStatuses.includes(status) ? status : 'applied',
-          date: get('dateapplied') || get('date') || today(),
-          contact: get('contact') || get('contactperson') || '',
-          salary: get('salary') || get('salaryrange') || '',
-          url: get('url') || get('joburl') || '',
-          notes: get('notes') || get('notes/feedback') || '',
+          company: get('company', 'empresa', 'companhia') || 'Unknown',
+          role: get('role', 'funcao', 'cargo', 'vaga', 'posicao') || '-',
+          status: validStatuses.includes(status) ? status : inferredStatus,
+          date: parseDate(rawDate),
+          contact: get('contact', 'contactperson', 'contacto', 'contato') || '',
+          salary: get('salary', 'salaryrange', 'salario') || '',
+          url: get('url', 'joburl', 'link') || '',
+          notes: get('notes', 'notes/feedback', 'notas', 'observacoes') || '',
+          roleDescription: get('roledescription', 'descricao', 'descricaodafuncao') || '',
           screenshots: [],
-          history: [{ date: get('dateapplied') || get('date') || today(), event: 'Applied (imported)', id: Date.now() + i }],
+          history: [{ date: parseDate(rawDate), event: 'Applied (imported)', id: Date.now() + i }],
         })
       }
 

@@ -56,6 +56,13 @@ export default function ApplicationCard({ app, onEdit, onDelete, onAddHistory, o
             )}
           </div>
 
+          {app.roleDescription && (
+            <div className="border-t border-divider pt-2 mt-1">
+              <p className="text-xs text-default-400 mb-1">Role Description</p>
+              <p className="text-sm text-default-500 whitespace-pre-line">{app.roleDescription}</p>
+            </div>
+          )}
+
           {app.notes && (
             <p className="text-sm text-default-500 border-t border-divider pt-2 mt-1">
               {app.notes}

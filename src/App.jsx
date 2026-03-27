@@ -5,6 +5,7 @@ import FilterBar from './components/FilterBar'
 import ApplicationForm from './components/ApplicationForm'
 import ApplicationList from './components/ApplicationList'
 import ProfileTab from './components/ProfileTab'
+import InformationTab from './components/InformationTab'
 import { useApplications } from './hooks/useApplications'
 
 function App() {
@@ -96,6 +97,7 @@ function App() {
         )}
 
         {activeTab === 'profile' && <ProfileTab />}
+        {activeTab === 'rules' && <InformationTab />}
       </main>
     </div>
   )
