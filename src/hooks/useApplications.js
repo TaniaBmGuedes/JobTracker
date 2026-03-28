@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useLocalStorage } from './useLocalStorage'
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { toast } from '@heroui/react'
 
 const emptyForm = {
   company: '',
@@ -38,6 +39,9 @@ export function useApplications() {
         apps.map((app) => (app.id === editingId ? { ...form, id: editingId } : app))
       )
       setEditingId(null)
+      toast.success('Application updated', {
+        description: `${form.company} — ${form.role}`,
+      })
     } else {
       const newApp = {
         ...form,
@@ -45,6 +49,9 @@ export function useApplications() {
         history: [{ date: form.date, event: 'Applied', id: Date.now() }],
       }
       setApplications((apps) => [newApp, ...apps])
+      toast.success('Application added', {
+        description: `${form.company} — ${form.role}`,
+      })
     }
     setForm(emptyForm)
     setShowForm(false)
@@ -58,6 +65,7 @@ export function useApplications() {
           : app
       )
     )
+    toast.success('Timeline event added')
   }
 
   const removeHistoryEvent = (appId, eventId) => {
@@ -68,12 +76,17 @@ export function useApplications() {
           : app
       )
     )
+    toast.warning('Timeline event removed')
   }
 
   const handleArchive = (id) => {
+    const app = applications.find((a) => a.id === id)
     setApplications((apps) =>
-      apps.map((app) => (app.id === id ? { ...app, archived: !app.archived } : app))
+      apps.map((a) => (a.id === id ? { ...a, archived: !a.archived } : a))
     )
+    toast.info(app?.archived ? 'Application unarchived' : 'Application archived', {
+      description: app ? `${app.company} — ${app.role}` : undefined,
+    })
   }
 
   const handleEdit = (app) => {
@@ -83,7 +96,11 @@ export function useApplications() {
   }
 
   const handleDelete = (id) => {
-    setApplications((apps) => apps.filter((app) => app.id !== id))
+    const app = applications.find((a) => a.id === id)
+    setApplications((apps) => apps.filter((a) => a.id !== id))
+    toast.danger('Application deleted', {
+      description: app ? `${app.company} — ${app.role}` : undefined,
+    })
   }
 
   const handleCancel = () => {
@@ -98,7 +115,7 @@ export function useApplications() {
         app.company.toLowerCase().includes(search.toLowerCase()) ||
         app.role.toLowerCase().includes(search.toLowerCase())
       const matchesStatus = filterStatus === 'all' || app.status === filterStatus
-      const matchesArchive = showArchived || !app.archived
+      const matchesArchive = showArchived ? !!app.archived : !app.archived
       return matchesSearch && matchesStatus && matchesArchive
     })
 
@@ -146,6 +163,9 @@ export function useApplications() {
     a.download = `job-applications-${new Date().toISOString().split('T')[0]}.csv`
     a.click()
     URL.revokeObjectURL(url)
+    toast.success('CSV exported', {
+      description: `${applications.length} application${applications.length !== 1 ? 's' : ''}`,
+    })
   }
 
   const exportPDF = () => {
@@ -174,6 +194,9 @@ export function useApplications() {
     })
 
     doc.save(`job-applications-${new Date().toISOString().split('T')[0]}.pdf`)
+    toast.success('PDF exported', {
+      description: `${applications.length} application${applications.length !== 1 ? 's' : ''}`,
+    })
   }
 
   const importCSV = (file) => {
@@ -261,6 +284,9 @@ export function useApplications() {
 
       if (imported.length > 0) {
         setApplications((apps) => [...imported, ...apps])
+        toast.success(`${imported.length} application${imported.length > 1 ? 's' : ''} imported`)
+      } else {
+        toast.warning('No applications found in file')
       }
     }
     reader.readAsText(file)

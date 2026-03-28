@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Toast } from '@heroui/react'
 import Header from './components/Header'
 import StatsBoard from './components/StatsBoard'
 import FilterBar from './components/FilterBar'
@@ -51,6 +52,7 @@ function App() {
 
   return (
     <div className="text-foreground bg-background min-h-dvh">
+      <Toast.Provider placement="bottom end" />
       <Header activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="max-w-4xl mx-auto px-4 pb-12">

@@ -1,4 +1,4 @@
-import { Button, InputGroup, InputGroupInput, InputGroupTextArea } from '@heroui/react'
+import { Button, InputGroup, InputGroupInput, InputGroupTextArea, toast } from '@heroui/react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useRef } from 'react'
 
@@ -16,11 +16,8 @@ const emptyProfile = {
 export default function ProfileTab() {
   const [profile, setProfile] = useLocalStorage('job-tracker-profile', emptyProfile)
   const cvInputRef = useRef(null)
-  const [saved, setSaved] = useLocalStorage('_profile_saved', false)
-
   const updateField = (field) => (e) => {
     setProfile((p) => ({ ...p, [field]: e.target.value }))
-    setSaved(false)
   }
 
   const handleCVUpload = (e) => {
@@ -29,7 +26,6 @@ export default function ProfileTab() {
     const reader = new FileReader()
     reader.onload = () => {
       setProfile((p) => ({ ...p, cv: { name: file.name, data: reader.result } }))
-      setSaved(false)
     }
     reader.readAsDataURL(file)
     e.target.value = ''
@@ -37,12 +33,11 @@ export default function ProfileTab() {
 
   const removeCv = () => {
     setProfile((p) => ({ ...p, cv: null }))
-    setSaved(false)
+    toast.warning('CV removed')
   }
 
   const handleSave = () => {
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    toast.success('Profile saved')
   }
 
   return (
@@ -194,7 +189,6 @@ export default function ProfileTab() {
           >
             Save Profile
           </Button>
-          {saved && <span className="text-sm text-success">Saved!</span>}
         </div>
       </div>
     </div>

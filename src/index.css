@@ -1,2 +1,32 @@
 @import "tailwindcss";
 @import "@heroui/react/styles";
+@import "@heroui/styles/components/toast.css";
+
+/* Toast UI improvements */
+.toast {
+  backdrop-filter: blur(12px);
+  background: oklch(from var(--color-surface) l c h / 0.85);
+  border: 1px solid oklch(from var(--color-border) l c h / 0.5);
+  box-shadow:
+    0 8px 32px oklch(0 0 0 / 0.12),
+    0 2px 8px oklch(0 0 0 / 0.08);
+  transition: translate 300ms cubic-bezier(0.16, 1, 0.3, 1),
+              scale 300ms cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 200ms ease;
+}
+
+.toast--success {
+  border-left: 3px solid var(--color-success);
+}
+
+.toast--danger {
+  border-left: 3px solid var(--color-danger);
+}
+
+.toast--warning {
+  border-left: 3px solid var(--color-warning);
+}
+
+.toast--accent {
+  border-left: 3px solid var(--color-primary);
+}
